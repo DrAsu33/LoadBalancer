@@ -1,0 +1,15 @@
+# 忽略 VSCode 配置文件夹
+.vscode/
+
+# 忽略 Makefile
+Makefile
+
+# 忽略编译生成的可执行文件 (假设你的程序叫 main)
+main
+*.exe
+
+# 忽略编译过程中的中间文件 (Object files)
+*.o
+
+# 忽略压缩包 (防止把作业提交包也传上去)
+*.zip
