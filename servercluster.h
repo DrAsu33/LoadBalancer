@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 
+constexpr int INF = 0x3FFFFFFF;
 // 服务器阵列的数据结构
 class ServerCluster
 {

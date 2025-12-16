@@ -15,9 +15,9 @@ ServerCluster::ServerCluster(int n)
     {
         adjacencymatrix[i].resize(n);
         for(int j = 0; j < n; j++)
-            adjacencymatrix[i][j] = -1;
+            adjacencymatrix[i][j] = INF;
     }
-    // 初始化全部为-1
+    // 初始化全部INF
 }
 
 
@@ -39,8 +39,8 @@ void ServerCluster::getedges(int m, std::istream& in)
     for(int i = 0; i < m; i++)
     {
         in >> u >> v >> path_cost >> bandwidth;
-        adjacencymatrix[u][v] = path_cost;
-        adjacencymatrix[v][u] = path_cost;
+        adjacencymatrix[u-1][v-1] = path_cost;
+        adjacencymatrix[v-1][u-1] = path_cost;
     }
 }
 
@@ -55,8 +55,9 @@ void ServerCluster::gettasks(int t, std::istream& in)
         tasks[i].index = task_id;
         tasks[i].start_node = start_node;
         tasks[i].demand = demand;
-        // 直接更新服务器负载
-        servers[start_node].GPU_used += demand;
+        // 直接更新服务器负载和节点任务
+        servers[start_node-1].GPU_used += demand;
+        servers[start_node-1].assigned_tasks.push_back(i);
     }
 }
 
