@@ -5,6 +5,7 @@ struct Task
 {
     int index;
     int start_node;
+    int current_node;
     int demand;
-    Task(int i = 0, int s = 0, int g = 0) : index(i), start_node(s), demand(g) {}
+    Task(int i = 0, int s = 0, int g = 0) : index(i), start_node(s), current_node(s), demand(g) {}
 };

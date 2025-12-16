@@ -10,10 +10,10 @@ class ServerCluster
 {
 private:
     std::vector<Server> servers;  //存放所有服务器的数据
-    std::vector<std::vector<int>> adjacencymatrix; //邻接矩阵，-1代表不连通
+    std::vector<std::vector<int>> adjacency_matrix; //邻接矩阵，-1代表不连通
     std::vector<Task> tasks;
-    int servernum;
-    int tasknum;
+    int server_num;
+    int task_num;
     std::vector<int> tasks_of_node(int i);
 
 public:
@@ -21,5 +21,5 @@ public:
     void getnodes(int n, std::istream& in);
     void getedges(int m, std::istream& in);
     void gettasks(int t, std::istream& in);
-    void optimize_basic();
+    void solve_basic();
 };
