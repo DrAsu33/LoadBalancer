@@ -48,7 +48,7 @@ void ServerCluster::solve_basic()
     }
     // 迁移完成
     for(const auto& task : tasks)
-        std::cout << task.index + 1 << " " << task.start_node << " " << task.current_node << std::endl;
+        std::cout << task.index + 1 << " " << task.start_node + 1 << " " << task.current_node  + 1 << std::endl;
     for(const auto& server : servers)
         std::cout << server.index + 1 << " " << server.gpu_used << std::endl;
     
