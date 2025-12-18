@@ -26,7 +26,7 @@ void ServerCluster::solve_basic()
             for(size_t dest_idx = 0; dest_idx < server_num; dest_idx++)
             {
                 // 不能传输给自己和不连通的服务器
-                if(task_idx == dest_idx || adjacency_matrix[task_idx][dest_idx] == INF)
+                if(server.index == dest_idx || adjacency_matrix[server.index][dest_idx] == INF)
                     continue;
 
                 Server& dest_server = servers[dest_idx];
@@ -38,7 +38,7 @@ void ServerCluster::solve_basic()
                     it = server.assigned_tasks.erase(it);
                     dest_server.assigned_tasks.push_back(task_idx);
                     tasks[task_idx].current_node = dest_idx;
-                    break;
+                    moved = true; break;
                 }
             }
             // 如果移动了，erase的时候迭代器就会指向下一个元素，不需要递增
