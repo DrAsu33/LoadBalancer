@@ -1,7 +1,7 @@
 #include "servercluster.h"
 
 // 启动优化函数，该函数是基本要求的函数
-void ServerCluster::solve_basic()
+void ServerCluster::solve_advanced()
 {
     // 先使用floyd算法检测每两个服务器是否连通
     run_floyd();
@@ -27,6 +27,8 @@ void ServerCluster::solve_basic()
             size_t task_idx = *it; 
             Task& task = tasks[task_idx];
             bool moved = false;
+            // 用自己作为初值，如果操作完minserver还是自己说明没找到
+            size_t best_dest_index = server.index; int min_cost = INF;
             // 尝试将该任务迁移到其他服务器
             for(size_t dest_idx = 0; dest_idx < servers.size(); dest_idx++)
             {
@@ -35,23 +37,31 @@ void ServerCluster::solve_basic()
                     continue;
 
                 Server& dest_server = servers[dest_idx];
-                // 可以容纳该任务,立即迁移
+                
+                // 可以容纳该任务,如果路径更短则更新
                 if(dest_server.capacity >= task.demand + dest_server.gpu_used)
                 {
-                    server.gpu_used -= task.demand;
-                    overflow -= task.demand;
-                    dest_server.gpu_used += task.demand;
-
-                    it = server.assigned_tasks.erase(it);
-                    dest_server.assigned_tasks.push_back(task_idx);
-                    task.current_node = dest_idx;
-                    moved = true; break;  // 每个任务只迁移一次
+                    if(adjacency_matrix[server.index][dest_idx] < min_cost)
+                    {
+                        min_cost = adjacency_matrix[server.index][dest_idx];
+                        best_dest_index = dest_idx;
+                    }
                 }
+            }
+            if(best_dest_index != server.index)
+            {
+                server.gpu_used -= task.demand;
+                overflow -= task.demand;
+                servers[best_dest_index].gpu_used += task.demand;
+
+                it = server.assigned_tasks.erase(it);
+                servers[best_dest_index].assigned_tasks.push_back(task_idx);
+                task.current_node = best_dest_index;
+                moved = true; // 每个任务只迁移一次
             }
             // 如果移动了，erase的时候迭代器就会指向下一个元素，不需要递增
             if(!moved)
                 it++;
         }    
     }
-    
 }

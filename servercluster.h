@@ -21,4 +21,6 @@ public:
     void getedges(size_t m, std::istream& in);
     void gettasks(size_t t, std::istream& in);
     void solve_basic();
+    void solve_advanced();
+    void print_results(std::ostream& out);
 };

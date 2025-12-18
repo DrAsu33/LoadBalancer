@@ -11,6 +11,7 @@ int main()
     servercluster.getnodes(N, std::cin);
     servercluster.getedges(M, std::cin);
     servercluster.gettasks(T, std::cin);
-    servercluster.solve_basic();
+    servercluster.solve_advanced();
+    servercluster.print_results(std::cout);
     return 0;
 }

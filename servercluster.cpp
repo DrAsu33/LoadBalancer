@@ -26,9 +26,9 @@ void ServerCluster::getnodes(size_t n, std::istream& in)
     size_t node_id; int capacity;
     for(size_t i = 0; i < n; i++)
     {
+        in >> node_id >> capacity;
         //  保证读入的node_id合法
         if(node_id == 0 || node_id > servers.size()) continue;
-        in >> node_id >> capacity;
         servers[node_id - 1].capacity = capacity;
     }
 }
@@ -39,9 +39,9 @@ void ServerCluster::getedges(size_t m, std::istream& in)
     size_t u, v; int path_cost, bandwidth;
     for(size_t i = 0; i < m; i++)
     {
+        in >> u >> v >> path_cost >> bandwidth;
         // 确保读入的数据合法
         if(u == 0 || v == 0 || u > servers.size() || v > servers.size()) continue;
-        in >> u >> v >> path_cost >> bandwidth;
         adjacency_matrix[u-1][v-1] = path_cost;
         adjacency_matrix[v-1][u-1] = path_cost;
     }
@@ -54,9 +54,9 @@ void ServerCluster::gettasks(size_t t, std::istream& in)
     tasks.resize(t);
     for(size_t i = 0; i < t; i++)
     {
+        in >> task_id >> start_node >> demand;
         // 确保读入的数据合法
         if(start_node == 0 || start_node > servers.size()) continue;
-        in >> task_id >> start_node >> demand;
         tasks[i].index = task_id - 1;
         tasks[i].start_node = start_node - 1;
         tasks[i].current_node = start_node - 1;
@@ -76,4 +76,14 @@ void ServerCluster::run_floyd()
                     adjacency_matrix[i][j] = 
                     std::min(adjacency_matrix[i][j], 
                     adjacency_matrix[i][k] + adjacency_matrix[k][j]);
+}
+
+void ServerCluster::print_results(std::ostream& out)
+{
+    // 输出每个任务的迁移结果
+    for(const auto& task : tasks)
+        out << task.index + 1 << " " << task.start_node + 1 << " " << task.current_node  + 1 << std::endl;
+    // 输出每台服务器最终负载
+    for(const auto& server : servers)
+        out << server.index + 1 << " " << server.gpu_used << std::endl;
 }
