@@ -13,8 +13,6 @@ private:
     std::vector<Server> servers;  //存放所有服务器的数据
     std::vector<std::vector<int>> adjacency_matrix; //邻接矩阵，INF表示不连通
     std::vector<Task> tasks;
-    size_t server_num;
-    size_t task_num;
     void run_floyd();
 
 public:
