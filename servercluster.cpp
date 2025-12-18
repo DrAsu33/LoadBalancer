@@ -1,20 +1,20 @@
 #include "servercluster.h"
 
 // 构造函数， 为所有vector分配内存
-ServerCluster::ServerCluster(int n)
+ServerCluster::ServerCluster(size_t n)
 {
     server_num = n;
     servers.resize(n);
     // 为每个服务器编号（从0开始）
     // 涉及到服务器，任务编号都需要调整索引
-    for(int i = 0; i < n; i++)
+    for(size_t i = 0; i < n; i++)
         servers[i].index = i;
     
     adjacency_matrix.resize(n);      
-    for(int i = 0; i < n; i++)
+    for(size_t i = 0; i < n; i++)
     {
         adjacency_matrix[i].resize(n);
-        for(int j = 0; j < n; j++)
+        for(size_t j = 0; j < n; j++)
             adjacency_matrix[i][j] = (i == j) ? 0 : INF;
     }
     // 初始化全部INF, 如果是对角线元素则设为0
@@ -22,10 +22,10 @@ ServerCluster::ServerCluster(int n)
 
 
 // 按行读入服务器节点
-void ServerCluster::getnodes(int n, std::istream& in)
+void ServerCluster::getnodes(size_t n, std::istream& in)
 {
-    int node_id, capacity;
-    for(int i = 0; i < n; i++)
+    size_t node_id; int capacity;
+    for(size_t i = 0; i < n; i++)
     {
         in >> node_id >> capacity;
         servers[node_id - 1].capacity = capacity;
@@ -33,10 +33,11 @@ void ServerCluster::getnodes(int n, std::istream& in)
 }
 
 // 按行读入网络链路
-void ServerCluster::getedges(int m, std::istream& in)
+void ServerCluster::getedges(size_t m, std::istream& in)
 {
-    int u, v, path_cost, bandwidth;
-    for(int i = 0; i < m; i++)
+    // 确保输入的索引没有0
+    size_t u, v; int path_cost, bandwidth;
+    for(size_t i = 0; i < m; i++)
     {
         in >> u >> v >> path_cost >> bandwidth;
         adjacency_matrix[u-1][v-1] = path_cost;
@@ -45,16 +46,16 @@ void ServerCluster::getedges(int m, std::istream& in)
 }
 
 // 按行读入任务
-void ServerCluster::gettasks(int t, std::istream& in)
+void ServerCluster::gettasks(size_t t, std::istream& in)
 {
-    int task_id, start_node, demand;
+    size_t task_id, start_node; int demand;
     tasks.resize(t); task_num = t;
-    for(int i = 0; i < t; i++)
+    for(size_t i = 0; i < t; i++)
     {
         in >> task_id >> start_node >> demand;
-        tasks[i].index = task_id;
-        tasks[i].start_node = start_node;
-        tasks[i].current_node = start_node;
+        tasks[i].index = task_id - 1;
+        tasks[i].start_node = start_node - 1;
+        tasks[i].current_node = start_node - 1;
         tasks[i].demand = demand;
         // 直接更新服务器负载和节点任务
         servers[start_node-1].gpu_used += demand;
@@ -62,12 +63,13 @@ void ServerCluster::gettasks(int t, std::istream& in)
     }
 }
 
-// 启动优化函数，该函数是基本要求的函数
-void ServerCluster::solve_basic()
+void ServerCluster::run_floyd()
 {
-    // 分为超载的服务器和未超载的服务器
-    std::vector<int> overloaded, available;
-
-
-
+    for(size_t k = 0; k < server_num; k++)
+        for(size_t i = 0; i < server_num; i++)
+            for(size_t j = 0; j < server_num; j++)
+                if(adjacency_matrix[i][k] != INF && adjacency_matrix[k][j] != INF)
+                    adjacency_matrix[i][j] = 
+                    std::min(adjacency_matrix[i][j], 
+                    adjacency_matrix[i][k] + adjacency_matrix[k][j]);
 }

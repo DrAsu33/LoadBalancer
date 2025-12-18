@@ -5,7 +5,7 @@
 
 int main()
 {
-    int N, M, T;
+    size_t N, M, T;
     std::cin >> N >> M >> T;
     ServerCluster servercluster(N);
     servercluster.getnodes(N, std::cin);
