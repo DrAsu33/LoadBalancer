@@ -98,14 +98,17 @@ void ServerCluster::solve_additional()
                 continue;
 
             bool enable = true;  // 是否有足够的带宽迁移
-            std::vector<size_t> path = plan.path_nodes;
+            const std::vector<size_t>& path = plan.path_nodes;
+            // 防止因意外导致数组越界访问
+            if(path.size() < 2)
+                continue;
             for(size_t i = 0; i < path.size() - 1; i++)
             {
                 if(current_bandwidth[path[i]][path[i+1]] < plan.demand)
                     enable = false;
             }
             // 如果带宽不足就跳过
-            if(!enable || path.size() < 2)
+            if(!enable)
                 continue;
 
             count++;
