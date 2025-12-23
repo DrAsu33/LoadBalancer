@@ -29,7 +29,7 @@ void ServerCluster::solve_advanced()
             Task& task = tasks[task_idx];
             bool moved = false;
             // 用自己作为初值，如果操作完minserver还是自己说明没找到
-            size_t best_dest_index = server.index; int min_cost = INF;
+            size_t best_dest_index = server.index; long long min_cost = INF;
             // 尝试将该任务迁移到其他服务器
             for(size_t dest_idx = 0; dest_idx < servers.size(); dest_idx++)
             {
@@ -68,7 +68,7 @@ void ServerCluster::solve_advanced()
         }    
     }
 
-    int total_cost = 0;
+    long long total_cost = 0;
     // 输出每个任务的迁移结果
     for(const auto& task : tasks)
     {

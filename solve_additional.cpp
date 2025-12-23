@@ -1,20 +1,22 @@
 #include "servercluster.h"
 
+// 迁移计划的数据结构
+struct MigrationPlan 
+{
+    size_t task_id;
+    size_t from_node;
+    size_t to_node;
+    int demand;
+    bool is_completed;
+    std::vector<size_t> path_nodes;
+    MigrationPlan(size_t id, size_t f, size_t t, int d, const std::vector<size_t>& p)
+        : task_id(id), from_node(f), to_node(t), demand(d), is_completed(false), path_nodes(p) {}
+};
+
 // 启动优化函数， 该函数是附加要求的函数
 void ServerCluster::solve_additional()
 {
-    // 迁移计划的数据结构
-    struct MigrationPlan 
-    {
-        size_t task_id;
-        size_t from_node;
-        size_t to_node;
-        int demand;
-        bool is_completed;
-        std::vector<size_t> path_nodes;
-        MigrationPlan(size_t id, size_t f, size_t t, int d, const std::vector<size_t>& p)
-            : task_id(id), from_node(f), to_node(t), demand(d), is_completed(false), path_nodes(p) {}
-    };
+
     // 先使用floyd算法检测每两个服务器是否连通, 并储存最短路径
     run_floyd_parent();
 
@@ -44,7 +46,7 @@ void ServerCluster::solve_additional()
             Task& task = tasks[task_idx];
             bool moved = false;
             // 用自己作为初值，如果操作完minserver还是自己说明没找到
-            size_t best_dest_index = server.index; int min_cost = INF;
+            size_t best_dest_index = server.index; long long min_cost = INF;
             // 尝试将该任务迁移到其他服务器
             for(size_t dest_idx = 0; dest_idx < servers.size(); dest_idx++)
             {
@@ -87,7 +89,7 @@ void ServerCluster::solve_additional()
     while(count < pending_queue.size())
     {
         timestep++; // 时间递增， 从1开始
-        auto current_bandwidth = bandwidth_matrix;
+        auto current_bandwidth = bandwidth_matrix;  // 每次循环都进行一次深拷贝， 考虑到n不会超过50所以可以接受
         bool deadlock_check = false; // 检测是否产生死锁，导致死循环
         for(auto& plan : pending_queue)
         {
@@ -103,7 +105,7 @@ void ServerCluster::solve_additional()
                     enable = false;
             }
             // 如果带宽不足就跳过
-            if(!enable)
+            if(!enable || path.size() < 2)
                 continue;
 
             count++;
@@ -122,7 +124,7 @@ void ServerCluster::solve_additional()
     }
     std::cout << timestep << std::endl;
 
-    int total_cost = 0;
+    long long total_cost = 0;
     // 输出每个任务的迁移结果
     for(const auto& task : tasks)
     {

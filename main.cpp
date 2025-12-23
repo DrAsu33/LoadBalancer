@@ -7,8 +7,7 @@
 int main()
 {
     size_t N, M, T;
-    std::ifstream file("test_case.txt");
-    std::istream& in = file.is_open() ? file : std::cin;
+    std::istream& in = std::cin;
     in >> N >> M >> T;
 
     ServerCluster servercluster(N);
