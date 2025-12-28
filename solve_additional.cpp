@@ -13,13 +13,22 @@ struct MigrationPlan
         : task_id(id), from_node(f), to_node(t), demand(d), is_completed(false), path_nodes(p) {}
 };
 
+//每一步任务移动信息的数据结构
+struct StepLog
+{
+    int timestep;
+    size_t task_id, from, to;
+    StepLog(int t, size_t tid, size_t f, size_t t1) : timestep(t), task_id(tid), from(f), to(t1) {}
+    void print_log() const {std::cout << timestep << " " << task_id << " " << from << " " << to << std::endl;}
+};
+
 // 启动优化函数， 该函数是附加要求的函数
 void ServerCluster::solve_additional()
 {
 
-    // 先使用floyd算法检测每两个服务器是否连通, 并储存最短路径
+    // 先使用floyd算法检测每两个服务器是否连通, 并储存最短路径, 并建立log向量
     run_floyd_parent();
-
+    std::vector<StepLog> logs;
     int timestep = 0;
     std::vector<MigrationPlan> pending_queue;
 
@@ -104,7 +113,7 @@ void ServerCluster::solve_additional()
                 continue;
             for(size_t i = 0; i < path.size() - 1; i++)
             {
-                if(current_bandwidth[path[i]][path[i+1]] < plan.demand)
+                if(current_bandwidth[path[i]][path[i+1]] < 1)
                     enable = false;
             }
             // 如果带宽不足就跳过
@@ -114,10 +123,10 @@ void ServerCluster::solve_additional()
             count++;
             // 依次消耗带宽
             for(size_t i = 0; i < path.size() - 1; i++)
-                current_bandwidth[path[i]][path[i+1]] -= plan.demand;
+                current_bandwidth[path[i]][path[i+1]] -= 1;
             plan.is_completed = true;
             deadlock_check = true;
-            std::cout << timestep << " " << plan.task_id + 1 << " " << plan.from_node + 1 << " " << plan.to_node + 1 << std::endl;
+            logs.push_back(StepLog(timestep, plan.task_id + 1, plan.from_node + 1, plan.to_node + 1));
         }
         if (!deadlock_check && count < pending_queue.size()) 
         {
@@ -125,9 +134,13 @@ void ServerCluster::solve_additional()
             break; 
         }
     }
-    std::cout << timestep << std::endl;
-
     long long total_cost = 0;
+    // 输出迁移所需要的总时间
+    std::cout << timestep << std::endl;
+    // 输出所有记录下来的移动信息
+    for(const auto& log : logs)
+        log.print_log();
+        
     // 输出每个任务的迁移结果
     for(const auto& task : tasks)
     {

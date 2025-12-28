@@ -1,0 +1,1 @@
+g++ -Wall -std=c++20 -O2 main.cpp servercluster.cpp solve_additional.cpp solve_advanced.cpp solve_basic.cpp -o main
